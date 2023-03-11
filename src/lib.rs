@@ -19,17 +19,21 @@ pub mod prelude {
 pub struct OutputDeviceParameters {
     /// Sample rate of your audio data.
     pub sample_rate: usize,
+
     /// Desired amount of audio channels. Must be at least one. Typical values: 1 - mono, 2 - stereo, etc.
     /// The data provided by the call back is _interleaved_, which means that if you have two channels then
     /// the sample layout will be like so: `LRLRLR..`, where `L` - a sample of left channel, and `R` a sample
     /// of right channel.
     pub channels_count: usize,
+
     /// Amount of samples per each channel. Allows you to tweak audio latency, the more the value the more
     /// latency will be and vice versa. Keep in mind, that your data callback must be able to render the
     /// samples while previous portion of data is being played, otherwise you'll get a glitchy audio.
     ///
     /// If you need to get a specific length in **seconds**, then you need to use sampling rate to calculate
     /// the required amount of samples per channel: `channel_sample_count = sample_rate * time_in_seconds`.
+    ///
+    /// The crate guarantees, that the intermediate buffer size will match the requested value.
     pub channel_sample_count: usize,
 }
 

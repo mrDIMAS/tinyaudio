@@ -1,19 +1,20 @@
 # TinyAudio
 
-TinyAudio is a cross-platform audio output library. It's main goal to provide unified access to
+TinyAudio is a cross-platform audio output library. Its main goal to provide unified access to
 a default sound output device of your operating system as easy as possible, covering as many platforms
 such as PC (Windows, Linux, macOS), Mobile Devices (Android, iOS), and WebAssembly.
 
 ## What this crate can do
 
 The crate just takes the data you've prepared and sends it to a default operating system's sound output
-device. It uses floating-point audio samples and converts them to closest supported platform-dependent
-format automatically. Use it, if you need to play your audio samples as easy as possible.
+device. It uses floating-point audio samples and converts them to the closest supported platform-dependent
+format automatically. The crate guarantees, that the intermediate data buffer will always be of requested size.
+Use this crate, if you need to play your audio samples as easy as possible.
 
 ## What this crate cannot do
 
 It does not load any sound formats, it doesn't apply any digital signal processing (DSP) techniques, it
-doesn't do audio spatialization and so on. Also the crate does not support device enumeration, device
+doesn't do audio spatialization and so on. Also, the crate does not support device enumeration, device
 selection, querying of supported formats, input capturing (i.e. from microphone).
 
 ## Supported platforms
@@ -26,7 +27,7 @@ selection, querying of supported formats, input capturing (i.e. from microphone)
 
 The crate internally creates an audio output context and uses a user-defined callback to supply the device
 with samples to play. The callback will be called periodically to generate new data; it will be called util
-the device instance is "alive". In other words this crate performs simplest audio streaming.
+the device instance is "alive". In other words this crate performs the simplest audio streaming.
 
 ## Examples
 
@@ -34,10 +35,11 @@ The crate is very easy to use, here's a few examples that will help you to start
 
 ### Initialization
 
-A simplest possible example that shows how to initialize an output device.
+The simplest possible example that shows how to initialize an output device.
 
 ```rust,no_run
-# use tinyaudio::prelude::*;
+use tinyaudio::prelude::*;
+
 let _device = run_output_device(
     OutputDeviceParameters {
         channels_count: 2,
