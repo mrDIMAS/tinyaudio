@@ -20,7 +20,7 @@ selection, querying of supported formats, input capturing (i.e. from microphone)
 
 | Windows | Linux | macOS | WebAssembly | Android | iOS |
 |---------|-------|-------|-------------|---------|-----|
-| ✅       | 🚧    | 🚧    | 🚧          | 🚧      | 🚧  |
+| ✅       | 🚧    | 🚧    | 🚧          | ✅       | 🚧  |
 
 ## How it works
 
@@ -42,7 +42,7 @@ let _device = run_output_device(
     OutputDeviceParameters {
         channels_count: 2,
         sample_rate: 44100,
-        channel_sample_count: 4100,
+        channel_sample_count: 4410,
     },
     move |_| {
         // Output silence
@@ -62,7 +62,7 @@ A simple example that plays a sine wave of 440 Hz looks like so:
 let params = OutputDeviceParameters {
     channels_count: 2,
     sample_rate: 44100,
-    channel_sample_count: 4100,
+    channel_sample_count: 4410,
 };
 
 let _device = run_output_device(params, {

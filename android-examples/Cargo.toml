@@ -1,0 +1,16 @@
+[package]
+name = "android_example"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate_type = ["cdylib"]
+
+[dependencies]
+tinyaudio = { path = "../" }
+android-activity = { version = "0.4.1", features = ["native-activity"] }
+
+[package.metadata.android.sdk]
+min_sdk_version = 26
+target_sdk_version = 30
+max_sdk_version = 29

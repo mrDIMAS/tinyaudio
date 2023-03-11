@@ -8,7 +8,7 @@ fn main() {
         OutputDeviceParameters {
             channels_count: 2,
             sample_rate: 44100,
-            channel_sample_count: 4100,
+            channel_sample_count: 4410,
         },
         move |_| {
             // Output silence

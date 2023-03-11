@@ -3,15 +3,15 @@
 
 use std::error::Error;
 
+mod aaudio;
 mod alsa; // TODO
 mod coreaudio; // TODO
 mod directsound;
-mod opensles; // TODO
 mod web; // TODO
 
 #[doc(hidden)]
 pub mod prelude {
-    pub use super::{run_output_device, OutputDeviceParameters};
+    pub use super::{run_output_device, BaseAudioOutputDevice, OutputDeviceParameters};
 }
 
 /// Parameters of an output device.
@@ -58,6 +58,14 @@ where
     #[cfg(target_os = "windows")]
     {
         return Ok(Box::new(directsound::DirectSoundDevice::new(
+            params,
+            data_callback,
+        )?));
+    }
+
+    #[cfg(target_os = "android")]
+    {
+        return Ok(Box::new(aaudio::AAudioOutputDevice::new(
             params,
             data_callback,
         )?));
