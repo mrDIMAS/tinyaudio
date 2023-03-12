@@ -7,7 +7,7 @@ mod aaudio;
 mod alsa; // TODO
 mod coreaudio; // TODO
 mod directsound;
-mod web; // TODO
+mod web;
 
 #[doc(hidden)]
 pub mod prelude {
@@ -73,6 +73,11 @@ where
             params,
             data_callback,
         )?));
+    }
+
+    #[cfg(all(target_os = "unknown", target_arch = "wasm32"))]
+    {
+        return Ok(Box::new(web::WebAudioDevice::new(params, data_callback)?));
     }
 
     #[cfg(not(target_os = "windows"))]
