@@ -32,8 +32,18 @@ the device instance is "alive". In other words this crate performs the simplest 
 ## Android details
 
 This crate uses `AAudio` for audio output on Android platform. `AAudio` is quite new API, which was added in ~2017 
-(in Android 8.1 Oreo). This means that you have to use `API Level 26+` to get the crate up and running. See 
-`android-examples` directory for examples. 
+(in Android 8.1 Oreo). This means that you have to use `API Level 26+` to get the crate up and running. Also, you must
+initialize an audio device only after your application has gained focus (`GainedFocus` event in `android-activity` crate),
+otherwise device creation will fail. See `android-examples` 
+[directory](https://github.com/mrDIMAS/tinyaudio/tree/main/android-examples) for examples. 
+
+## WebAssembly details
+
+Most of the web browsers nowadays requires a "confirmation" action from a user (usually a button click or something similar) to 
+allow a web page to play an audio. This means that you must initialize an audio device _only_ after some action on
+a web page that runs your WebAssembly package. In the simplest scenario it could be a simple button with a callback
+that initializes an audio device. See `wasm-examples` [directory](https://github.com/mrDIMAS/tinyaudio/tree/main/android-examples)
+for examples.
 
 ## Examples
 
@@ -90,13 +100,3 @@ let _device = run_output_device(params, {
 
 std::thread::sleep(std::time::Duration::from_secs(5));
 ```
-
-### Android
-
-See `android-examples` [directory](https://github.com/mrDIMAS/tinyaudio/tree/main/android-examples) for Android 
-examples.
-
-### WebAssembly
-
-See `wasm-examples` [directory](https://github.com/mrDIMAS/tinyaudio/tree/main/android-examples) for WebAssembly 
-examples.
