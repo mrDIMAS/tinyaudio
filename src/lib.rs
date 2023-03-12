@@ -4,7 +4,7 @@
 use std::error::Error;
 
 mod aaudio;
-mod alsa; // TODO
+mod alsa;
 mod coreaudio; // TODO
 mod directsound;
 mod web;

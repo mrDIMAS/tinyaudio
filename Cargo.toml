@@ -34,3 +34,6 @@ features = [
     "AudioBufferSourceNode",
     "AudioDestinationNode"
 ]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+alsa-sys = { version = "0.3.1" }
