@@ -21,7 +21,7 @@ selection, querying of supported formats, input capturing (i.e. from microphone)
 
 | Windows | Linux | macOS | WebAssembly | Android | iOS |
 |---------|-------|-------|-------------|---------|-----|
-| ✅       | 🚧    | 🚧    | ✅           | ✅       | 🚧  |
+| ✅       | ✅     | 🚧    | ✅           | ✅       | 🚧  |
 
 ## How it works
 
