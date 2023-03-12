@@ -29,6 +29,12 @@ The crate internally creates an audio output context and uses a user-defined cal
 with samples to play. The callback will be called periodically to generate new data; it will be called util
 the device instance is "alive". In other words this crate performs the simplest audio streaming.
 
+## Android details
+
+This crate uses `AAudio` for audio output on Android platform. `AAudio` is quite new API, which was added in ~2017 
+(in Android 8.1 Oreo). This means that you have to use `API Level 26+` to get the crate up and running. See 
+`android-examples` directory for examples. 
+
 ## Examples
 
 The crate is very easy to use, here's a few examples that will help you to start using it right away.
@@ -84,3 +90,13 @@ let _device = run_output_device(params, {
 
 std::thread::sleep(std::time::Duration::from_secs(5));
 ```
+
+### Android
+
+See `android-examples` [directory](https://github.com/mrDIMAS/tinyaudio/tree/main/android-examples) for Android 
+examples.
+
+### WebAssembly
+
+See `wasm-examples` [directory](https://github.com/mrDIMAS/tinyaudio/tree/main/android-examples) for WebAssembly 
+examples.
