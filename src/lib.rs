@@ -75,13 +75,18 @@ where
         )?));
     }
 
+    #[cfg(target_os = "linux")]
+    {
+        return Ok(Box::new(alsa::AlsaSoundDevice::new(params, data_callback)?));
+    }
+
     #[cfg(all(target_os = "unknown", target_arch = "wasm32"))]
     {
         return Ok(Box::new(web::WebAudioDevice::new(params, data_callback)?));
     }
 
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "android")))]
     {
-        Ok(Box::new(()))
+        Err(Box::new("Platform is not supported".to_string().into()))
     }
 }
