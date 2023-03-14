@@ -5,7 +5,7 @@ use std::error::Error;
 
 mod aaudio;
 mod alsa;
-mod coreaudio; // TODO
+mod coreaudio;
 mod directsound;
 mod web;
 
@@ -85,7 +85,21 @@ where
         return Ok(Box::new(web::WebAudioDevice::new(params, data_callback)?));
     }
 
-    #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "android")))]
+    #[cfg(any(target_os = "macos", target_os = "ios"))]
+    {
+        return Ok(Box::new(coreaudio::CoreaudioSoundDevice::new(
+            params,
+            data_callback,
+        )?));
+    }
+
+    #[cfg(not(any(
+        target_os = "windows",
+        target_os = "linux",
+        target_os = "android",
+        target_os = "macos",
+        target_os = "ios"
+    )))]
     {
         Err(Box::new("Platform is not supported".to_string().into()))
     }
