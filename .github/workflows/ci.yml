@@ -74,7 +74,7 @@ jobs:
           override: true
           target: armv7-linux-androideabi
       - run: rustup update
-      - run: rustc --version && cargo --version && wasm-pack --version
+      - run: rustc --version && cargo --version
       - run: cargo update
       - name: Build
         run: cargo check --verbose --workspace --target=armv7-linux-androideabi --all-features
