@@ -1,0 +1,107 @@
+name: CI
+on: [push, pull_request]
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: --deny warnings
+
+jobs:
+  tests:
+    name: Tests CI
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [stable]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+      - name: Install linux deps
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get update # Run update first or install might start failing eventually.
+          sudo apt-get install --no-install-recommends -y libasound2-dev libudev-dev pkg-config
+      - run: rustup update
+      - run: rustc --version && cargo --version
+      - name: Build
+        run: cargo build --verbose --workspace --all-targets --all-features
+      - name: Test
+        run: cargo test --verbose --workspace --all-features
+
+  wasm:
+    name: Wasm CI
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [stable]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+      - name: Install Dependencies
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - run: rustup update
+      - run: rustc --version && cargo --version && wasm-pack --version
+      - run: cargo update
+      - name: Build
+        run: |
+          cd wasm-examples
+          wasm-pack build --target web
+      - name: Test
+        run: |
+          cd wasm-examples
+          wasm-pack test --headless --chrome
+          wasm-pack test --headless --firefox
+
+  format:
+    name: Rustfmt CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: rustup update
+      - run: cargo fmt --version
+      - run: cargo fmt -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: clippy
+          override: true
+      - name: Update
+        run: sudo apt update
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update # Run update first or install might start failing eventually
+          sudo apt-get install --no-install-recommends -y libasound2-dev libudev-dev pkg-config
+      - run: cargo clippy --version
+      - run: cargo clippy --workspace --all-targets --all-features -- --deny warnings
+
+  docs:
+    name: Documentation CI
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - run: rustup update
+      - run: rustc --version && cargo --version
+      - name: Build Docs
+        run: cargo doc --all-features
+        env:
+          RUSTDOCFLAGS: --deny warnings
