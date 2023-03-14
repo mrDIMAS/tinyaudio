@@ -60,6 +60,24 @@ jobs:
           cd wasm-examples
           wasm-pack test --headless --chrome
           wasm-pack test --headless --firefox
+  android:
+    name: Android CI
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: armv7-linux-androideabi
+      - run: rustup update
+      - run: rustc --version && cargo --version && wasm-pack --version
+      - run: cargo update
+      - name: Build
+        run: cargo check --verbose --workspace --target=armv7-linux-androideabi --all-features
 
   format:
     name: Rustfmt CI
