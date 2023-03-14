@@ -2,6 +2,24 @@
 name = "tinyaudio"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "TinyAudio is a cross-platform, easy-to-use, low-level, audio output library."
+keywords = ["audio", "ouput", "lowlevel"]
+categories = ["multimedia::audio"]
+include = [
+    "/src/**/*",
+    "/Cargo.toml",
+    "/LICENSE",
+    "/README.md",
+    "/examples/*",
+    "/wasm-examples/**/*",
+    "/android-examples/**/*"
+]
+homepage = "https://github.com/mrDIMAS/tinyaudio"
+documentation = "https://docs.rs/tinyaudio"
+repository = "https://github.com/mrDIMAS/tinyaudio"
+readme = "README.md"
+rust-version = "1.56"
 
 [workspace]
 members = ["android-examples", "wasm-examples"]

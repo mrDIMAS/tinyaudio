@@ -17,7 +17,8 @@ pub mod prelude {
 /// Parameters of an output device.
 #[derive(Copy, Clone)]
 pub struct OutputDeviceParameters {
-    /// Sample rate of your audio data.
+    /// Sample rate of your audio data. Typical values are: 11025 Hz, 22050 Hz, 44100 Hz (default), 48000 Hz,
+    /// 96000 Hz.
     pub sample_rate: usize,
 
     /// Desired amount of audio channels. Must be at least one. Typical values: 1 - mono, 2 - stereo, etc.
@@ -52,6 +53,36 @@ trait AudioOutputDevice: BaseAudioOutputDevice {
 /// Creates a new output device that uses default audio output device of your operating system to play the
 /// samples produced by the specified `data_callback`. The callback will be called periodically to generate
 /// another portion of samples.
+///
+/// ## Examples
+///
+/// The following examples plays a 440 Hz sine wave for 5 seconds.
+///
+/// ```rust,no_run
+/// # use tinyaudio::prelude::*;
+/// let params = OutputDeviceParameters {
+///     channels_count: 2,
+///     sample_rate: 44100,
+///     channel_sample_count: 4410,
+/// };
+///
+/// let _device = run_output_device(params, {
+///     let mut clock = 0f32;
+///     move |data| {
+///         for samples in data.chunks_mut(params.channels_count) {
+///             clock = (clock + 1.0) % params.sample_rate as f32;
+///             let value =
+///                 (clock * 440.0 * 2.0 * std::f32::consts::PI / params.sample_rate as f32).sin();
+///             for sample in samples {
+///                 *sample = value;
+///             }
+///         }
+///     }
+/// })
+/// .unwrap();
+///
+/// std::thread::sleep(std::time::Duration::from_secs(5));
+/// ```
 #[allow(clippy::needless_return)]
 pub fn run_output_device<C>(
     params: OutputDeviceParameters,
