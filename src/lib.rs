@@ -52,6 +52,7 @@ trait AudioOutputDevice: BaseAudioOutputDevice {
 /// Creates a new output device that uses default audio output device of your operating system to play the
 /// samples produced by the specified `data_callback`. The callback will be called periodically to generate
 /// another portion of samples.
+#[allow(clippy::needless_return)]
 pub fn run_output_device<C>(
     params: OutputDeviceParameters,
     data_callback: C,
