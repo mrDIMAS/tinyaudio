@@ -1,6 +1,6 @@
 #![cfg(target_os = "android")]
 
-use android_activity::{AndroidApp, InputStatus, MainEvent, PollEvent};
+use android_activity::{AndroidApp, MainEvent, PollEvent};
 use tinyaudio::prelude::*;
 
 fn play_sine_wave() -> Box<dyn BaseAudioOutputDevice> {
