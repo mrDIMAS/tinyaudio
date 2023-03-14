@@ -1,3 +1,5 @@
+#![cfg(all(target_os = "unknown", target_arch = "wasm32"))]
+
 use crate::utils::set_panic_hook;
 use tinyaudio::prelude::*;
 use wasm_bindgen::prelude::*;

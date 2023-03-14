@@ -1,3 +1,5 @@
+#![cfg(target_os = "android")]
+
 use android_activity::{AndroidApp, InputStatus, MainEvent, PollEvent};
 use tinyaudio::prelude::*;
 
