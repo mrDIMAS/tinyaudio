@@ -12,6 +12,8 @@ pub struct AAudioOutputDevice {
 
 impl BaseAudioOutputDevice for AAudioOutputDevice {}
 
+unsafe impl Send for AAudioOutputDevice {}
+
 fn convert_err(err: aaudio::Error) -> Box<dyn Error> {
     format!("{:?}", err).into()
 }

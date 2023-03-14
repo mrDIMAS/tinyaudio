@@ -87,6 +87,8 @@ pub struct WebAudioDevice {
 
 impl BaseAudioOutputDevice for WebAudioDevice {}
 
+unsafe impl Send for WebAudioDevice {}
+
 impl AudioOutputDevice for WebAudioDevice {
     fn new<C>(params: OutputDeviceParameters, data_callback: C) -> Result<Self, Box<dyn Error>>
     where

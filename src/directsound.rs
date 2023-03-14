@@ -114,6 +114,8 @@ where
 
 impl BaseAudioOutputDevice for DirectSoundDevice {}
 
+unsafe impl Send for DirectSoundDevice {}
+
 impl AudioOutputDevice for DirectSoundDevice {
     fn new<C>(params: OutputDeviceParameters, data_callback: C) -> Result<Self, Box<dyn Error>>
     where

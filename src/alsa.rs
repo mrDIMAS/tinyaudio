@@ -21,6 +21,8 @@ pub struct AlsaSoundDevice {
     is_running: Arc<AtomicBool>,
 }
 
+unsafe impl Send for AlsaSoundDevice {}
+
 pub fn err_code_to_string(err_code: c_int) -> String {
     unsafe {
         let message = CStr::from_ptr(snd_strerror(err_code) as *const _)

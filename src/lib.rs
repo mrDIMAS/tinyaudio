@@ -38,7 +38,7 @@ pub struct OutputDeviceParameters {
 }
 
 /// A base trait of a platform-dependent audio output device.
-pub trait BaseAudioOutputDevice {}
+pub trait BaseAudioOutputDevice: Send {}
 
 impl BaseAudioOutputDevice for () {}
 
@@ -98,9 +98,10 @@ where
         target_os = "linux",
         target_os = "android",
         target_os = "macos",
-        target_os = "ios"
+        target_os = "ios",
+        all(target_os = "unknown", target_arch = "wasm32")
     )))]
     {
-        Err(Box::new("Platform is not supported".to_string().into()))
+        Err("Platform is not supported".to_string().into())
     }
 }

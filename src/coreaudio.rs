@@ -14,6 +14,8 @@ pub struct CoreaudioSoundDevice {
     inner: Box<SendContext>,
 }
 
+unsafe impl Send for CoreaudioSoundDevice {}
+
 struct SendContext {
     data_callback: Box<dyn FnMut(&mut [f32]) + Send + 'static>,
     out_data: Vec<NativeSample>,
