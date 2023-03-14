@@ -79,6 +79,26 @@ jobs:
       - name: Build
         run: cargo check --verbose --workspace --target=armv7-linux-androideabi --all-features
 
+  ios:
+    name: iOS CI
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: brew install llvm
+    - name: Install stable
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+    - name: Add iOS targets
+      run: rustup target add aarch64-apple-ios x86_64-apple-ios
+    - name: Build aarch64
+      run: cargo check --verbose --workspace --target=aarch64-apple-ios --all-features
+    - name: Build x86_64
+      run: cargo check --verbose --workspace --target=x86_64-apple-ios --all-features
+
   format:
     name: Rustfmt CI
     runs-on: ubuntu-latest
