@@ -87,10 +87,10 @@ impl AudioOutputDevice for AlsaSoundDevice {
             check(snd_pcm_hw_params_set_period_size(
                 playback_device,
                 hw_params,
-                frame_count as u64,
+                frame_count as ::std::os::raw::c_ulong,
                 0,
             ))?;
-            let mut exact_size = (frame_count * 2) as u64;
+            let mut exact_size = (frame_count * 2) as ::std::os::raw::c_ulong;
             check(snd_pcm_hw_params_set_buffer_size_near(
                 playback_device,
                 hw_params,
@@ -104,12 +104,12 @@ impl AudioOutputDevice for AlsaSoundDevice {
             check(snd_pcm_sw_params_set_avail_min(
                 playback_device,
                 sw_params,
-                frame_count as u64,
+                frame_count as ::std::os::raw::c_ulong,
             ))?;
             check(snd_pcm_sw_params_set_start_threshold(
                 playback_device,
                 sw_params,
-                frame_count as u64,
+                frame_count as ::std::os::raw::c_ulong,
             ))?;
             check(snd_pcm_sw_params(playback_device, sw_params))?;
             check(snd_pcm_prepare(playback_device))?;
@@ -188,7 +188,7 @@ where
                     let err = snd_pcm_writei(
                         self.playback_device,
                         self.output_buffer.as_ptr() as *const _,
-                        self.params.channel_sample_count as u64,
+                        self.params.channel_sample_count as ::std::os::raw::c_ulong,
                     ) as i32;
 
                     if err < 0 {
