@@ -1,6 +1,6 @@
 [package]
 name = "tinyaudio"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 description = "TinyAudio is a cross-platform, easy-to-use, low-level, audio output library."
