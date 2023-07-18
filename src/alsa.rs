@@ -84,11 +84,13 @@ impl AudioOutputDevice for AlsaSoundDevice {
                 hw_params,
                 params.channels_count as u32,
             ))?;
-            check(snd_pcm_hw_params_set_period_size(
+            let mut exact_frame_count = frame_count as u64;
+            let mut exact_period = 0;
+            check(snd_pcm_hw_params_set_period_size_near(
                 playback_device,
                 hw_params,
-                frame_count as ::std::os::raw::c_ulong,
-                0,
+                &mut exact_frame_count,
+                &mut exact_period,
             ))?;
             let mut exact_size = (frame_count * 2) as ::std::os::raw::c_ulong;
             check(snd_pcm_hw_params_set_buffer_size_near(
