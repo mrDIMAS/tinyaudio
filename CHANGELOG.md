@@ -1,3 +1,9 @@
+# 0.1.3
+
+- Fixed audio stutters on Android.
+- Correctly pass sample rate to output device config on Android.
+- Print errors to `stderr` on Android. 
+
 # 0.1.2
 
 - Fixed crash on some Linux distros due to the use of `snd_pcm_hw_params_set_period_size`
