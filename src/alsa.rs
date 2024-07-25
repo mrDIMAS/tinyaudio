@@ -72,7 +72,7 @@ impl AudioOutputDevice for AlsaSoundDevice {
                 hw_params,
                 SND_PCM_FORMAT_S16_LE,
             ))?;
-            let mut exact_rate = params.sample_rate as u32;
+            let mut exact_rate = params.sample_rate as ::std::os::raw::c_uint;
             check(snd_pcm_hw_params_set_rate_near(
                 playback_device,
                 hw_params,
@@ -82,9 +82,9 @@ impl AudioOutputDevice for AlsaSoundDevice {
             check(snd_pcm_hw_params_set_channels(
                 playback_device,
                 hw_params,
-                params.channels_count as u32,
+                params.channels_count as ::std::os::raw::c_uint,
             ))?;
-            let mut _exact_period = frame_count as u64;
+            let mut _exact_period = frame_count as snd_pcm_uframes_t;
             let mut _direction = 0;
             check(snd_pcm_hw_params_set_period_size_near(
                 playback_device,
