@@ -1,3 +1,7 @@
+# 0.1.4
+
+- Fixed more compilation issues on 32-bit targets on Linux.
+
 # 0.1.3
 
 - Fixed audio stutters on Android.
