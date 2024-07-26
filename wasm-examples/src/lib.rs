@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 mod utils;
 
 #[wasm_bindgen]
-pub fn play_sine_wave() {
+pub fn play_sine_wave() -> OutputDevice {
     set_panic_hook();
 
     let params = OutputDeviceParameters {
@@ -16,7 +16,7 @@ pub fn play_sine_wave() {
         channel_sample_count: 4410,
     };
 
-    let device = run_output_device(params, {
+    run_output_device(params, {
         let mut clock = 0f32;
         move |data| {
             for samples in data.chunks_mut(params.channels_count) {
@@ -29,7 +29,5 @@ pub fn play_sine_wave() {
             }
         }
     })
-    .unwrap();
-
-    Box::leak(device);
+    .unwrap()
 }

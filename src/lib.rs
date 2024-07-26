@@ -3,6 +3,9 @@
 
 use std::error::Error;
 
+#[cfg(all(target_os = "unknown", target_arch = "wasm32"))]
+use wasm_bindgen::prelude::wasm_bindgen;
+
 mod aaudio;
 mod alsa;
 mod coreaudio;
@@ -11,7 +14,7 @@ mod web;
 
 #[doc(hidden)]
 pub mod prelude {
-    pub use super::{run_output_device, BaseAudioOutputDevice, OutputDeviceParameters};
+    pub use super::{run_output_device, OutputDevice, OutputDeviceParameters};
 }
 
 /// Parameters of an output device.
@@ -38,8 +41,7 @@ pub struct OutputDeviceParameters {
     pub channel_sample_count: usize,
 }
 
-/// A base trait of a platform-dependent audio output device.
-pub trait BaseAudioOutputDevice: Send {}
+trait BaseAudioOutputDevice: Send + 'static {}
 
 impl BaseAudioOutputDevice for () {}
 
@@ -48,6 +50,29 @@ trait AudioOutputDevice: BaseAudioOutputDevice {
     where
         C: FnMut(&mut [f32]) + Send + 'static,
         Self: Sized;
+}
+
+/// An opaque "handle" to platform-dependent audio output device.
+#[cfg_attr(all(target_os = "unknown", target_arch = "wasm32"), wasm_bindgen)]
+pub struct OutputDevice {
+    device: Option<Box<dyn BaseAudioOutputDevice>>,
+}
+
+impl OutputDevice {
+    fn new<D: BaseAudioOutputDevice>(device: D) -> Self {
+        Self {
+            device: Some(Box::new(device)),
+        }
+    }
+}
+
+#[cfg_attr(all(target_os = "unknown", target_arch = "wasm32"), wasm_bindgen)]
+impl OutputDevice {
+    /// Closes the output device and release all system resources occupied by it. Any calls of this
+    /// method after the device was closed does nothing.
+    pub fn close(&mut self) {
+        self.device.take();
+    }
 }
 
 /// Creates a new output device that uses default audio output device of your operating system to play the
@@ -87,13 +112,13 @@ trait AudioOutputDevice: BaseAudioOutputDevice {
 pub fn run_output_device<C>(
     params: OutputDeviceParameters,
     data_callback: C,
-) -> Result<Box<dyn BaseAudioOutputDevice>, Box<dyn Error>>
+) -> Result<OutputDevice, Box<dyn Error>>
 where
     C: FnMut(&mut [f32]) + Send + 'static,
 {
     #[cfg(target_os = "windows")]
     {
-        return Ok(Box::new(directsound::DirectSoundDevice::new(
+        return Ok(OutputDevice::new(directsound::DirectSoundDevice::new(
             params,
             data_callback,
         )?));
@@ -101,7 +126,7 @@ where
 
     #[cfg(target_os = "android")]
     {
-        return Ok(Box::new(aaudio::AAudioOutputDevice::new(
+        return Ok(OutputDevice::new(aaudio::AAudioOutputDevice::new(
             params,
             data_callback,
         )?));
@@ -109,17 +134,23 @@ where
 
     #[cfg(target_os = "linux")]
     {
-        return Ok(Box::new(alsa::AlsaSoundDevice::new(params, data_callback)?));
+        return Ok(OutputDevice::new(alsa::AlsaSoundDevice::new(
+            params,
+            data_callback,
+        )?));
     }
 
     #[cfg(all(target_os = "unknown", target_arch = "wasm32"))]
     {
-        return Ok(Box::new(web::WebAudioDevice::new(params, data_callback)?));
+        return Ok(OutputDevice::new(web::WebAudioDevice::new(
+            params,
+            data_callback,
+        )?));
     }
 
     #[cfg(any(target_os = "macos", target_os = "ios"))]
     {
-        return Ok(Box::new(coreaudio::CoreaudioSoundDevice::new(
+        return Ok(OutputDevice::new(coreaudio::CoreaudioSoundDevice::new(
             params,
             data_callback,
         )?));
