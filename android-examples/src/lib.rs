@@ -3,7 +3,7 @@
 use android_activity::{AndroidApp, MainEvent, PollEvent};
 use tinyaudio::prelude::*;
 
-fn play_sine_wave() -> Box<dyn BaseAudioOutputDevice> {
+fn play_sine_wave() -> OutputDevice {
     let params = OutputDeviceParameters {
         channels_count: 2,
         sample_rate: 44100,
