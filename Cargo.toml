@@ -22,7 +22,7 @@ readme = "README.md"
 rust-version = "1.56"
 
 [workspace]
-members = ["android-examples", "wasm-examples"]
+members = ["android-examples", "wasm-examples", "ios-example/Rust-TinyAudioExample"]
 
 # Make sure the separate examples (i.e. for Android or WebAssembly) will use the crate optimized.
 [profile.dev.package."*"]
