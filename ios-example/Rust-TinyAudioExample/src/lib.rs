@@ -1,5 +1,6 @@
+#![cfg(target_os = "ios")]
 use tinyaudio::prelude::*;
-static mut DEVICE_HANDLE: Option<Box<dyn BaseAudioOutputDevice>> = None;
+static mut DEVICE_HANDLE: Option<OutputDevice> = None;
 
 #[no_mangle]
 pub extern "C" fn create_audio_device() -> i32 {
