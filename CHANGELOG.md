@@ -2,7 +2,8 @@
 
 - Fixed crash on WebAssembly when using `atomics` target feature.
 - Added opaque handle to sound output device. `run_output_device` now returns `Result<OutputDevice, Box<dyn Error>>`
-  instead of `Result<Box<dyn BaseAudioOutputDevice>, Box<dyn Error>>`.
+  instead of `Result<Box<dyn BaseAudioOutputDevice>, Box<dyn Error>>`. `OutputDevice` can be now passed to JS side
+  freely.
 - Ability to close audio output device without dropping it (via `OutputDevice::close` method). Useful on platforms with
   garbage collection (such as WebAssembly).
 - Added iOS example.
