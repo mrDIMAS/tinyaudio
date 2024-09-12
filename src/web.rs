@@ -41,6 +41,7 @@ fn create_buffer(
         .map_err(convert_err)?)
 }
 
+#[cfg(not(target_feature = "atomics"))]
 fn write_samples(
     buffer: &AudioBuffer,
     channels_count: usize,
@@ -55,6 +56,60 @@ fn write_samples(
         buffer
             .copy_to_channel(&temp_samples, channel_index as i32)
             .unwrap();
+    }
+}
+
+#[cfg(target_feature = "atomics")]
+mod atomics {
+    use crate::wasm_bindgen;
+    use js_sys::wasm_bindgen::JsCast;
+    use wasm_bindgen::JsValue;
+    use web_sys::AudioBuffer;
+
+    // Create custom bindings to AudioBuffer `copyToChannel` method, that does not use generated
+    // bindings to Rust arrays and just uses plain JS array.
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(js_name = AudioBuffer)]
+        type ArrayAudioBuffer;
+
+        # [wasm_bindgen(catch, method, structural, js_class = "AudioBuffer", js_name = copyToChannel)]
+        pub fn copy_to_channel(
+            this: &ArrayAudioBuffer,
+            source: &js_sys::Float32Array,
+            channel_number: i32,
+        ) -> Result<(), JsValue>;
+    }
+
+    pub fn write_samples(
+        buffer: &AudioBuffer,
+        channels_count: usize,
+        interleaved_data_buffer: &[f32],
+        temp_samples: &mut Vec<f32>,
+        temporary_channel_array_view: &js_sys::Float32Array,
+    ) {
+        for channel_index in 0..channels_count {
+            // Copy channel samples from the interleaved buffer into the temporary one.
+            temp_samples.clear();
+            for samples in interleaved_data_buffer.chunks(channels_count) {
+                temp_samples.push(samples[channel_index]);
+            }
+
+            // Do another clone to temporary JS buffer.
+            temporary_channel_array_view.copy_from(temp_samples);
+
+            // Copy samples from this temporary buffer to the channel buffer.
+            buffer
+                .unchecked_ref::<ArrayAudioBuffer>()
+                .copy_to_channel(&temporary_channel_array_view, channel_index as i32)
+                .unwrap();
+        }
+    }
+
+    pub fn make_temp_js_buffer(channel_sample_count: usize) -> js_sys::Float32Array {
+        let byte_count = (size_of::<f32>() * channel_sample_count) as u32;
+        let temporary_channel_array = js_sys::ArrayBuffer::new(byte_count);
+        js_sys::Float32Array::new(&temporary_channel_array)
     }
 }
 
@@ -119,6 +174,9 @@ impl AudioOutputDevice for WebAudioDevice {
                 vec![0.0f32; params.channel_sample_count * params.channels_count];
             let mut temp_samples = vec![0.0f32; params.channel_sample_count];
 
+            #[cfg(target_feature = "atomics")]
+            let temp_js_samples = atomics::make_temp_js_buffer(params.channel_sample_count);
+
             onended_closure
                 .write()
                 .unwrap()
@@ -133,12 +191,26 @@ impl AudioOutputDevice for WebAudioDevice {
 
                     (callback.lock().unwrap())(&mut interleaved_data_buffer);
 
-                    write_samples(
-                        &buffer,
-                        params.channels_count,
-                        &interleaved_data_buffer,
-                        &mut temp_samples,
-                    );
+                    #[cfg(not(target_feature = "atomics"))]
+                    {
+                        write_samples(
+                            &buffer,
+                            params.channels_count,
+                            &interleaved_data_buffer,
+                            &mut temp_samples,
+                        );
+                    }
+
+                    #[cfg(target_feature = "atomics")]
+                    {
+                        atomics::write_samples(
+                            &buffer,
+                            params.channels_count,
+                            &interleaved_data_buffer,
+                            &mut temp_samples,
+                            &temp_js_samples,
+                        )
+                    }
 
                     create_buffer_source(
                         &audio_context_clone,
