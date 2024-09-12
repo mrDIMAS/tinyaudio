@@ -25,12 +25,12 @@ pub extern "C" fn create_audio_device() -> i32 {
     });
     match device_result {
         Ok(device) => {
-            unsafe { DEVICE_HANDLE = Some(device); }
+            unsafe {
+                DEVICE_HANDLE = Some(device);
+            }
             1
         }
-        Err(_) => {
-            -1
-        }
+        Err(_) => -1,
     }
 }
 
@@ -38,8 +38,8 @@ pub extern "C" fn create_audio_device() -> i32 {
 pub extern "C" fn is_audio_initialized() -> i32 {
     unsafe {
         match DEVICE_HANDLE.is_some() {
-            true => { 1 }
-            false => { 0 }
+            true => 1,
+            false => 0,
         }
     }
 }

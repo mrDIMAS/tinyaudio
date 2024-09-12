@@ -1,6 +1,7 @@
 //! WebAssembly output device via `WebAudio`
 
 #![cfg(all(target_os = "unknown", target_arch = "wasm32"))]
+#![allow(deprecated)]
 
 use crate::{AudioOutputDevice, BaseAudioOutputDevice, OutputDeviceParameters};
 use std::{

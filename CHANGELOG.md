@@ -1,8 +1,11 @@
-# Unpublished
+# 0.2.0
 
-- Added opaque handle to sound output device.
-- Ability to close audio output device without dropping it (via `close` method). Useful on platforms with garbage
-  collection (such as WebAssembly).
+- Fixed crash on WebAssembly when using `atomics` target feature.
+- Added opaque handle to sound output device. `run_output_device` now returns `Result<OutputDevice, Box<dyn Error>>`
+  instead of `Result<Box<dyn BaseAudioOutputDevice>, Box<dyn Error>>`.
+- Ability to close audio output device without dropping it (via `OutputDevice::close` method). Useful on platforms with
+  garbage collection (such as WebAssembly).
+- Added iOS example.
 
 # 0.1.4
 
