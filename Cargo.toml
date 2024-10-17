@@ -4,7 +4,7 @@ version = "1.0.0"
 edition = "2021"
 license = "MIT"
 description = "TinyAudio is a cross-platform, easy-to-use, low-level, audio output library."
-keywords = ["audio", "ouput", "lowlevel"]
+keywords = ["audio", "output", "lowlevel"]
 categories = ["multimedia::audio"]
 include = [
     "/src/**/*",
