@@ -1,3 +1,7 @@
+# 1.0.0
+
+- First major release.
+
 # 0.2.0
 
 - Fixed crash on WebAssembly when using `atomics` target feature.
