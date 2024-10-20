@@ -100,3 +100,14 @@ let _device = run_output_device(params, {
 
 std::thread::sleep(std::time::Duration::from_secs(5));
 ```
+
+## Comparison with alternatives
+
+The closest alternative is `cpal` which is much more feature-rich, and has more complex API. Initialization of
+`cpal` is quite verbose and could be confusing.
+Compare [this example](https://github.com/RustAudio/cpal/blob/f43d36e55494993bbbde3299af0c53e5cdf4d4cf/examples/beep.rs)
+from `cpal` with the example from the above code snippet. The next main difference is that `cpal` does not guarantee
+that the size of the output buffer will be exactly the same as requested during the creation of audio stream, while
+`TinyAudio` strictly guarantees this. Having a buffer of fixed size could be mandatory for some algorithms (such as
+HRTF). Feature-parity is not a goal for this library, its main goal is to do one particular task, but do it as well
+as possible.
