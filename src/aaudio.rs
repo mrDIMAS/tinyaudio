@@ -4,8 +4,8 @@
 
 use crate::{AudioOutputDevice, BaseAudioOutputDevice, OutputDeviceParameters};
 use ndk::audio::{
-    AudioStream, AudioStreamBuilder, AudioCallbackResult, AudioDirection, AudioFormat, AudioPerformanceMode,
-    AudioError,
+    AudioCallbackResult, AudioDirection, AudioError, AudioFormat, AudioPerformanceMode,
+    AudioStream, AudioStreamBuilder,
 };
 use std::error::Error;
 
@@ -39,21 +39,21 @@ impl AudioOutputDevice for AAudioOutputDevice {
             .performance_mode(AudioPerformanceMode::LowLatency)
             // Force the AAudio to give the buffer of fixed size.
             .frames_per_data_callback(frame_count)
-            .data_callback(
-                Box::new(move |_, data, num_frames| {
-                    let output_data = unsafe {
-                        std::slice::from_raw_parts_mut::<f32>(
-                            data as *mut f32,
-                            num_frames as usize * params.channels_count,
-                        )
-                    };
+            .data_callback(Box::new(move |_, data, num_frames| {
+                let output_data = unsafe {
+                    std::slice::from_raw_parts_mut::<f32>(
+                        data as *mut f32,
+                        num_frames as usize * params.channels_count,
+                    )
+                };
 
-                    data_callback(output_data);
+                data_callback(output_data);
 
-                    AudioCallbackResult::Continue
-                })
-            )
-            .error_callback(Box::new(|_, error| eprintln!("AAudio: an error has occurred - {:?}", error)))
+                AudioCallbackResult::Continue
+            }))
+            .error_callback(Box::new(|_, error| {
+                eprintln!("AAudio: an error has occurred - {:?}", error)
+            }))
             .open_stream()
             .map_err(convert_err)?;
 
