@@ -1,5 +1,7 @@
 #![cfg(target_os = "ios")]
 use tinyaudio::prelude::*;
+
+#[allow(static_mut_refs)]
 static mut DEVICE_HANDLE: Option<OutputDevice> = None;
 
 #[no_mangle]
