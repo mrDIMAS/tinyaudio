@@ -1,3 +1,9 @@
+# 1.1.0
+
+- Migrated to `ndk` crate instead of `aaudio`, which is unmaintained and has build problems (see
+  [#13](https://github.com/mrDIMAS/tinyaudio/pull/13)).
+- Fixed compilation warnings in WebAssembly/iOS examples.
+
 # 1.0.0
 
 - First major release.
