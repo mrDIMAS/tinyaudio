@@ -39,6 +39,7 @@ pub extern "C" fn create_audio_device() -> i32 {
 #[no_mangle]
 pub extern "C" fn is_audio_initialized() -> i32 {
     unsafe {
+        #[allow(static_mut_refs)]
         match DEVICE_HANDLE.is_some() {
             true => 1,
             false => 0,
