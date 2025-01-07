@@ -10,7 +10,7 @@ use ndk::audio::{
 use std::error::Error;
 
 pub struct AAudioOutputDevice {
-    stream: AudioStream,
+    _stream: AudioStream,
 }
 
 impl BaseAudioOutputDevice for AAudioOutputDevice {}
@@ -28,7 +28,7 @@ impl AudioOutputDevice for AAudioOutputDevice {
         Self: Sized,
     {
         let frame_count = params.channel_sample_count as i32;
-        let mut stream = AudioStreamBuilder::new()
+        let stream = AudioStreamBuilder::new()
             .map_err(convert_err)?
             // Ensure double buffering is possible.
             .buffer_capacity_in_frames(2 * frame_count)
@@ -59,6 +59,6 @@ impl AudioOutputDevice for AAudioOutputDevice {
 
         stream.request_start().map_err(convert_err)?;
 
-        Ok(Self { stream })
+        Ok(Self { _stream: stream })
     }
 }
