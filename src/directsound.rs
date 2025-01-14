@@ -218,9 +218,9 @@ impl AudioOutputDevice for DirectSoundDevice {
                 DataSender {
                     buffer,
                     notify_points,
+                    data_buffer: vec![0.0; channel_sample_count * channels_count]
+                        .into_boxed_slice(),
                     data_callback,
-                    channels_count,
-                    channel_sample_count,
                     is_running: is_running.clone(),
                 }
                 .run_in_thread(),
@@ -257,9 +257,8 @@ impl Drop for DirectSoundDevice {
 struct DataSender<C> {
     buffer: *mut IDirectSoundBuffer,
     notify_points: [*mut c_void; 2],
+    data_buffer: Box<[f32]>,
     data_callback: C,
-    channels_count: usize,
-    channel_sample_count: usize,
     is_running: Arc<AtomicBool>,
 }
 
@@ -278,27 +277,25 @@ where
     }
 
     unsafe fn run_send_loop(&mut self) {
-        let mut data_buffer = vec![0.0; self.channel_sample_count * self.channels_count];
-        let device_buffer_half_len_bytes = (data_buffer.len() * size_of::<DeviceSample>()) as DWORD;
+        let device_buffer_half_len_bytes =
+            (self.data_buffer.len() * size_of::<DeviceSample>()) as DWORD;
 
         while self.is_running.load(Ordering::SeqCst) {
-            (self.data_callback)(&mut data_buffer);
+            (self.data_callback)(&mut self.data_buffer);
 
             // Wait and send.
             const WAIT_OBJECT_1: u32 = WAIT_OBJECT_0 + 1;
             match WaitForMultipleObjects(2, self.notify_points.as_ptr(), 0, INFINITE) {
-                WAIT_OBJECT_0 => self.write(
-                    device_buffer_half_len_bytes,
-                    device_buffer_half_len_bytes,
-                    &data_buffer,
-                ),
-                WAIT_OBJECT_1 => self.write(0, device_buffer_half_len_bytes, &data_buffer),
+                WAIT_OBJECT_0 => {
+                    self.write(device_buffer_half_len_bytes, device_buffer_half_len_bytes)
+                }
+                WAIT_OBJECT_1 => self.write(0, device_buffer_half_len_bytes),
                 _ => panic!("Unknown buffer point!"),
             }
         }
     }
 
-    unsafe fn write(&self, offset_bytes: DWORD, len_bytes: DWORD, data_buffer: &[f32]) {
+    unsafe fn write(&self, offset_bytes: DWORD, len_bytes: DWORD) {
         let mut size = 0;
         let mut device_buffer = null_mut();
         check(
@@ -317,12 +314,15 @@ where
 
         let device_buffer_slice = std::slice::from_raw_parts_mut::<DeviceSample>(
             device_buffer as *mut _,
-            data_buffer.len(),
+            self.data_buffer.len(),
         );
 
-        debug_assert_eq!(size as usize, data_buffer.len() * size_of::<DeviceSample>());
-        debug_assert_eq!(device_buffer_slice.len(), data_buffer.len());
-        for (in_sample, out_sample) in data_buffer.iter().zip(device_buffer_slice) {
+        debug_assert_eq!(
+            size as usize,
+            self.data_buffer.len() * size_of::<DeviceSample>()
+        );
+        debug_assert_eq!(device_buffer_slice.len(), self.data_buffer.len());
+        for (in_sample, out_sample) in self.data_buffer.iter().zip(device_buffer_slice) {
             *out_sample = (in_sample * DeviceSample::MAX as f32) as DeviceSample;
         }
 
