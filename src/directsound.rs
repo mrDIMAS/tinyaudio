@@ -281,6 +281,7 @@ where
             (self.data_buffer.len() * size_of::<DeviceSample>()) as DWORD;
 
         while self.is_running.load(Ordering::SeqCst) {
+            self.data_buffer.fill(0.0);
             (self.data_callback)(&mut self.data_buffer);
 
             // Wait and send.
