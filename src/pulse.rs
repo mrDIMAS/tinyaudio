@@ -1,6 +1,7 @@
 //! Linux output device via `PulseAudio`.
 
-#![cfg(target_os = "linux")]
+#![cfg(all(target_os = "linux", feature = "pulse"))]
+#![cfg_attr(feature = "alsa", allow(dead_code))]
 
 use crate::{AudioOutputDevice, BaseAudioOutputDevice, OutputDeviceParameters};
 use libpulse_sys::*;

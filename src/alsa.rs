@@ -1,6 +1,6 @@
 //! Linux output device via `alsa`.
 
-#![cfg(target_os = "linux")]
+#![cfg(all(target_os = "linux", feature = "alsa"))]
 
 use crate::{AudioOutputDevice, BaseAudioOutputDevice, OutputDeviceParameters};
 use alsa_sys::*;

@@ -7,7 +7,6 @@ use std::error::Error;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 mod aaudio;
-#[allow(dead_code)] // TODO: select audio device: alsa or pulse
 mod alsa;
 mod coreaudio;
 mod directsound;
@@ -136,11 +135,26 @@ where
 
     #[cfg(target_os = "linux")]
     {
-        // TODO: select audio device: alsa or pulse
-        return Ok(OutputDevice::new(pulse::PulseSoundDevice::new(
-            params,
-            data_callback,
-        )?));
+        #[cfg(feature = "alsa")]
+        {
+            return Ok(OutputDevice::new(alsa::AlsaSoundDevice::new(
+                params,
+                data_callback,
+            )?));
+        }
+
+        #[cfg(all(feature = "pulse", not(feature = "alsa")))]
+        {
+            return Ok(OutputDevice::new(pulse::PulseSoundDevice::new(
+                params,
+                data_callback,
+            )?));
+        }
+
+        #[cfg(all(not(feature = "alsa"), not(feature = "pulse")))]
+        {
+            compile_error!("Select \"alsa\" or \"pulse\" feature to use an audio device on Linux")
+        }
     }
 
     #[cfg(all(target_os = "unknown", target_arch = "wasm32"))]
