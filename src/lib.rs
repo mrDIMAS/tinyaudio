@@ -7,9 +7,11 @@ use std::error::Error;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 mod aaudio;
+#[allow(dead_code)] // TODO: select audio device: alsa or pulse
 mod alsa;
 mod coreaudio;
 mod directsound;
+mod pulse;
 mod web;
 
 #[doc(hidden)]
@@ -134,7 +136,8 @@ where
 
     #[cfg(target_os = "linux")]
     {
-        return Ok(OutputDevice::new(alsa::AlsaSoundDevice::new(
+        // TODO: select audio device: alsa or pulse
+        return Ok(OutputDevice::new(pulse::PulseSoundDevice::new(
             params,
             data_callback,
         )?));

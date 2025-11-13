@@ -54,7 +54,9 @@ features = [
 ]
 
 [target.'cfg(target_os = "linux")'.dependencies]
+# TODO: make this dependencies optional
 alsa-sys = { version = "0.3.1" }
+libpulse-sys = { version = "1.23.0" }
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
 coreaudio-sys = { version = "0.2.8" }
