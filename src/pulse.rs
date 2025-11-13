@@ -117,12 +117,22 @@ where
         let sample_rate = u32::try_from(params.sample_rate)
             .ok()
             .filter(|&sample_rate| sample_rate <= PA_RATE_MAX)
-            .ok_or_else(|| "sample rate exceeds maximum value".to_owned())?;
+            .ok_or_else(|| {
+                format!(
+                    "sample rate {} exceeds maximum allowed {}",
+                    params.sample_rate, PA_RATE_MAX,
+                )
+            })?;
 
         let channels_count = u8::try_from(params.channels_count)
             .ok()
             .filter(|&channels_count| channels_count <= PA_CHANNELS_MAX)
-            .ok_or_else(|| "channels count exceeds maximum value".to_owned())?;
+            .ok_or_else(|| {
+                format!(
+                    "channels count {} exceeds maximum allowed {}",
+                    params.channels_count, PA_CHANNELS_MAX,
+                )
+            })?;
 
         let spec = pa_sample_spec {
             format: PA_SAMPLE_FLOAT32LE,
