@@ -24,7 +24,7 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           sudo apt-get update # Run update first or install might start failing eventually.
-          sudo apt-get install --no-install-recommends -y libasound2-dev libudev-dev pkg-config
+          sudo apt-get install --no-install-recommends -y libasound2-dev libudev-dev libpulse-dev pkg-config
       - run: rustup update
       - run: rustc --version && cargo --version
       - name: Build
