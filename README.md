@@ -42,7 +42,7 @@ otherwise device creation will fail. See `android-examples`
 Most of the web browsers nowadays requires a "confirmation" action from a user (usually a button click or something similar) to 
 allow a web page to play an audio. This means that you must initialize an audio device _only_ after some action on
 a web page that runs your WebAssembly package. In the simplest scenario it could be a simple button with a callback
-that initializes an audio device. See `wasm-examples` [directory](https://github.com/mrDIMAS/tinyaudio/tree/main/android-examples)
+that initializes an audio device. See `wasm-examples` [directory](https://github.com/mrDIMAS/tinyaudio/tree/main/wasm-examples)
 for examples.
 
 ## Examples
