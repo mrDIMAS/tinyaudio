@@ -34,6 +34,7 @@ use winapi::{
 };
 
 // Declare missing structs and interfaces.
+#[allow(unexpected_cfgs)]
 STRUCT! {struct DSBPOSITIONNOTIFY {
     dwOffset: DWORD,
     hEventNotify: HANDLE,
