@@ -10,6 +10,7 @@ mod aaudio;
 mod alsa;
 mod coreaudio;
 mod directsound;
+mod pulse;
 mod web;
 
 #[doc(hidden)]
@@ -134,10 +135,26 @@ where
 
     #[cfg(target_os = "linux")]
     {
-        return Ok(OutputDevice::new(alsa::AlsaSoundDevice::new(
-            params,
-            data_callback,
-        )?));
+        #[cfg(feature = "alsa")]
+        {
+            return Ok(OutputDevice::new(alsa::AlsaSoundDevice::new(
+                params,
+                data_callback,
+            )?));
+        }
+
+        #[cfg(all(feature = "pulse", not(feature = "alsa")))]
+        {
+            return Ok(OutputDevice::new(pulse::PulseSoundDevice::new(
+                params,
+                data_callback,
+            )?));
+        }
+
+        #[cfg(all(not(feature = "alsa"), not(feature = "pulse")))]
+        {
+            compile_error!("Select \"alsa\" or \"pulse\" feature to use an audio device on Linux")
+        }
     }
 
     #[cfg(all(target_os = "unknown", target_arch = "wasm32"))]
