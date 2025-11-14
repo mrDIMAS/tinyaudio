@@ -2,6 +2,7 @@
 
 #![cfg(target_os = "windows")]
 #![allow(non_snake_case)]
+#![allow(unexpected_cfgs)]
 
 use crate::{AudioOutputDevice, BaseAudioOutputDevice, OutputDeviceParameters};
 use std::{
@@ -34,7 +35,6 @@ use winapi::{
 };
 
 // Declare missing structs and interfaces.
-#[allow(unexpected_cfgs)]
 STRUCT! {struct DSBPOSITIONNOTIFY {
     dwOffset: DWORD,
     hEventNotify: HANDLE,
