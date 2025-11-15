@@ -1,5 +1,5 @@
 name: CI
-on: [push, pull_request]
+on: [ push, pull_request ]
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: --deny warnings
@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [stable]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        rust: [ stable ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [stable]
+        rust: [ stable ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -83,21 +83,21 @@ jobs:
     name: iOS CI
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: brew install llvm
-    - name: Install stable
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    - name: Add iOS targets
-      run: rustup target add aarch64-apple-ios x86_64-apple-ios
-    - name: Build aarch64
-      run: cargo check --verbose --workspace --target=aarch64-apple-ios --all-features
-    - name: Build x86_64
-      run: cargo check --verbose --workspace --target=x86_64-apple-ios --all-features
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: brew install llvm
+      - name: Install stable
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Add iOS targets
+        run: rustup target add aarch64-apple-ios x86_64-apple-ios
+      - name: Build aarch64
+        run: cargo check --verbose --workspace --target=aarch64-apple-ios --all-features
+      - name: Build x86_64
+        run: cargo check --verbose --workspace --target=x86_64-apple-ios --all-features
 
   format:
     name: Rustfmt CI
@@ -123,7 +123,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update # Run update first or install might start failing eventually
-          sudo apt-get install --no-install-recommends -y libasound2-dev libudev-dev pkg-config
+          sudo apt-get install --no-install-recommends -y libasound2-dev libpulse-dev libudev-dev pkg-config
       - run: cargo clippy --version
       - run: cargo clippy --workspace --all-targets --all-features -- --deny warnings
 

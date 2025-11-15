@@ -1,3 +1,7 @@
+# 2.0.0
+
+- PulseAudio support for Linux. See `README.md` for detailed instructions of how to use it.
+
 # 1.1.0
 
 - Migrated to `ndk` crate instead of `aaudio`, which is unmaintained and has build problems (see
