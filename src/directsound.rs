@@ -26,6 +26,7 @@ use winapi::{
     },
     um::{
         dsound::*,
+        handleapi::CloseHandle,
         synchapi::{CreateEventA, WaitForMultipleObjects},
         unknwnbase::{IUnknown, IUnknownVtbl},
         winbase::{INFINITE, WAIT_OBJECT_0},
@@ -64,6 +65,7 @@ type DeviceSample = i16;
 
 pub struct DirectSoundDevice {
     direct_sound: *mut IDirectSound,
+    notify: *mut IDirectSoundNotify,
     data_sender_thread_handle: Option<JoinHandle<()>>,
     is_running: Arc<AtomicBool>,
 }
@@ -229,6 +231,7 @@ impl AudioOutputDevice for DirectSoundDevice {
 
             Ok(Self {
                 direct_sound,
+                notify,
                 data_sender_thread_handle,
                 is_running,
             })
@@ -251,6 +254,7 @@ impl Drop for DirectSoundDevice {
 
             // Ensure that the ref counter is zero to the device is actually destroyed.
             assert_eq!((*self.direct_sound).Release(), 0);
+            assert_eq!((*self.notify).Release(), 0);
         }
     }
 }
@@ -296,6 +300,12 @@ where
                 WAIT_OBJECT_1 => self.write(0, device_buffer_half_len_bytes, &data_buffer),
                 _ => panic!("Unknown buffer point!"),
             }
+        }
+
+        check((*self.buffer).Stop(), "Failed to stop buffer").unwrap();
+        assert_eq!((*self.buffer).Release(), 0);
+        for handle in self.notify_points {
+            assert_ne!(CloseHandle(handle), 0);
         }
     }
 
