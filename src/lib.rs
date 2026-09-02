@@ -133,7 +133,7 @@ where
         )?));
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     {
         #[cfg(feature = "alsa")]
         {
@@ -176,6 +176,7 @@ where
     #[cfg(not(any(
         target_os = "windows",
         target_os = "linux",
+        target_os = "freebsd",
         target_os = "android",
         target_os = "macos",
         target_os = "ios",
