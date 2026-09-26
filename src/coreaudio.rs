@@ -3,8 +3,15 @@
 #![cfg(any(target_os = "macos", target_os = "ios"))]
 
 use crate::{AudioOutputDevice, BaseAudioOutputDevice, OutputDeviceParameters};
-use coreaudio_sys::*;
-use std::{error::Error, ffi::c_void, mem::size_of};
+use objc2_audio_toolbox::{
+    AudioQueueAllocateBuffer, AudioQueueBufferRef, AudioQueueDispose, AudioQueueEnqueueBuffer,
+    AudioQueueNewOutput, AudioQueueRef, AudioQueueStart, AudioQueueStop,
+};
+use objc2_core_audio_types::{
+    kAudioFormatLinearPCM, kLinearPCMFormatFlagIsPacked, kLinearPCMFormatFlagIsSignedInteger,
+    AudioStreamBasicDescription,
+};
+use std::{error::Error, ffi::c_void, mem::size_of, ptr::NonNull};
 
 type NativeSample = i16;
 
@@ -27,22 +34,22 @@ struct SendContext {
 impl Drop for SendContext {
     fn drop(&mut self) {
         unsafe {
-            AudioQueueStop(self.queue, true as u8);
+            AudioQueueStop(self.queue, true);
             // Dispose audio queue and all of its resources, including its buffers
-            AudioQueueDispose(self.queue, false as u8);
+            AudioQueueDispose(self.queue, false);
         }
     }
 }
 
-fn check(error: OSStatus, msg: &str) -> Result<(), Box<dyn Error>> {
-    if error == noErr as i32 {
+fn check(error: i32, msg: &str) -> Result<(), Box<dyn Error>> {
+    if error == 0 {
         Ok(())
     } else {
         Err(format!("{}. Error code {}", msg, error).into())
     }
 }
 
-unsafe extern "C" fn audio_queue_callback(
+unsafe extern "C-unwind" fn audio_queue_callback(
     user_data: *mut c_void,
     queue: AudioQueueRef,
     buf: AudioQueueBufferRef,
@@ -61,7 +68,7 @@ unsafe extern "C" fn audio_queue_callback(
 
     // set the buffer data
     let src = inner.out_data.as_mut_ptr() as *mut u8;
-    let dst = (*buf).mAudioData as *const u8 as *mut u8;
+    let dst = (*buf).mAudioData.as_ptr() as *mut u8;
     std::ptr::copy_nonoverlapping(src, dst, buffer_len_bytes);
 
     AudioQueueEnqueueBuffer(queue, buf, 0, std::ptr::null_mut());
@@ -103,14 +110,14 @@ impl AudioOutputDevice for CoreaudioSoundDevice {
             let mut queue = std::ptr::null_mut();
             let res = unsafe {
                 AudioQueueNewOutput(
-                    &desc,
+                    NonNull::from(&desc),
                     Some(self::audio_queue_callback),
                     // `user_data` passed to ^ (`self::audio_queue_callback`)
                     (&mut *inner) as *const SendContext as *const c_void as *mut c_void,
-                    std::ptr::null_mut(),
-                    std::ptr::null(),
+                    None,
+                    None,
                     0,
-                    &mut queue,
+                    NonNull::from(&mut queue),
                 )
             };
 
@@ -127,7 +134,11 @@ impl AudioOutputDevice for CoreaudioSoundDevice {
             inner.bufs[i] = {
                 let mut buf: AudioQueueBufferRef = std::ptr::null_mut();
                 let res = unsafe {
-                    AudioQueueAllocateBuffer(inner.queue, buffer_len_bytes as u32, &mut buf)
+                    AudioQueueAllocateBuffer(
+                        inner.queue,
+                        buffer_len_bytes as u32,
+                        NonNull::from(&mut buf),
+                    )
                 };
 
                 check(res, "Failed to `AudioQueueAllocateBuffer`")?;
@@ -145,7 +156,7 @@ impl AudioOutputDevice for CoreaudioSoundDevice {
 
                     let data_ptr = (*buf).mAudioData;
                     std::ptr::write_bytes(
-                        data_ptr as *const u8 as *mut u8,
+                        data_ptr.as_ptr() as *mut u8,
                         0u8,
                         buffer_len_bytes as usize,
                     );
