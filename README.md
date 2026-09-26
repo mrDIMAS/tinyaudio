@@ -48,14 +48,6 @@ that initializes an audio device. See `wasm-examples`
 
 ## Linux details
 
-Do not forget to install the required development libraries, otherwise the crate won't compile:
-
-```shell
-sudo apt-get install libasound2-dev libudev-dev pkg-config
-```
-
-### Backends
-
 Linux supports two audio "backends" - `ALSA` and `PulseAudio`. By default, this crate uses `ALSA`, but this can be
 changed by specifying the `pulse` feature:
 
@@ -63,10 +55,20 @@ changed by specifying the `pulse` feature:
 tinyaudio = { version = "2", default-features = false, features = ["pulse"] }
 ```
 
-`PulseAudio` backend requires `libpulse-dev` to be installed:
+### ALSA
+
+The `ALSA` backend loads `libasound.so.2` at runtime (via `dlopen`), so no development headers are needed to build
+the crate. If the library is missing on the machine that runs your program, the program will still start, but
+`run_output_device` will return an error. On Debian/Ubuntu the runtime library is provided by the `libasound2`
+package, which is installed on practically all desktop systems.
+
+### PulseAudio
+
+`PulseAudio` backend links `libpulse` at build time and requires `libpulse-dev` to be installed, otherwise the
+crate won't compile:
 
 ```shell
-sudo apt-get install libpulse-dev
+sudo apt-get install libpulse-dev pkg-config
 ```
 
 ## Examples

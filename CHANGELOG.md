@@ -1,3 +1,10 @@
+# Unreleased
+
+- The `ALSA` backend now loads `libasound.so.2` at runtime with `dlopen` (via `libloading`) instead of linking it
+  at build time. Building no longer requires `libasound2-dev`, and a binary can start on a machine without ALSA
+  installed; `run_output_device` returns an error instead.
+- Bumped MSRV to 1.71 (required by `libloading`).
+
 # 2.0.0
 
 - PulseAudio support for Linux. See `README.md` for detailed instructions of how to use it.
